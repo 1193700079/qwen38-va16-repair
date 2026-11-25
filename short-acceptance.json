@@ -1,0 +1,122 @@
+[
+  {
+    "case": "arithmetic",
+    "elapsed": 18.051591844996437,
+    "response": {
+      "id": "chatcmpl-ae1f27db43aeee09",
+      "object": "chat.completion",
+      "created": 1795586383,
+      "model": "qwen3.8-27b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "12/5",
+            "refusal": null,
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [],
+            "reasoning": null
+          },
+          "logprobs": null,
+          "finish_reason": "stop",
+          "stop_reason": null,
+          "token_ids": null
+        }
+      ],
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "prompt_tokens": 38,
+        "total_tokens": 43,
+        "completion_tokens": 5,
+        "prompt_tokens_details": null
+      },
+      "prompt_logprobs": null,
+      "prompt_token_ids": null,
+      "kv_transfer_params": null
+    }
+  },
+  {
+    "case": "short_code",
+    "elapsed": 62.60494177695364,
+    "response": {
+      "id": "chatcmpl-87585cefeceb28ab",
+      "object": "chat.completion",
+      "created": 1795586401,
+      "model": "qwen3.8-27b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```python\ndef add(a: int, b: int) -> int:\n    return a + b\n```",
+            "refusal": null,
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [],
+            "reasoning": null
+          },
+          "logprobs": null,
+          "finish_reason": "stop",
+          "stop_reason": null,
+          "token_ids": null
+        }
+      ],
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "prompt_tokens": 26,
+        "total_tokens": 51,
+        "completion_tokens": 25,
+        "prompt_tokens_details": null
+      },
+      "prompt_logprobs": null,
+      "prompt_token_ids": null,
+      "kv_transfer_params": null
+    }
+  },
+  {
+    "case": "state_isolation",
+    "elapsed": 15.939857364166528,
+    "response": {
+      "id": "chatcmpl-ad6ae9e0c7df28c6",
+      "object": "chat.completion",
+      "created": 1795586464,
+      "model": "qwen3.8-27b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "12",
+            "refusal": null,
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [],
+            "reasoning": null
+          },
+          "logprobs": null,
+          "finish_reason": "stop",
+          "stop_reason": null,
+          "token_ids": null
+        }
+      ],
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "prompt_tokens": 22,
+        "total_tokens": 25,
+        "completion_tokens": 3,
+        "prompt_tokens_details": null
+      },
+      "prompt_logprobs": null,
+      "prompt_token_ids": null,
+      "kv_transfer_params": null
+    }
+  }
+]

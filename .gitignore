@@ -1,0 +1,8 @@
+# Build artifacts / vendor-derived snapshots are NOT part of this repo.
+# Only our own kernel module under sources/ is tracked (required by Dockerfile).
+__pycache__/
+*.pyc
+*.tgz
+*.pt
+sources/*
+!sources/server_gdn_vacc_fast.py

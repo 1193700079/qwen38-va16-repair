@@ -1,0 +1,12 @@
+[7]: Initializing VACM logger with config: /opt/vacc/vslog.cfg.
+Traceback (most recent call last):
+  File "/work/test_decode_hardware.py", line 18, in <module>
+    o,s=fn(*[t.to('vacc') for t in (q,k,v,g,beta)],cu_seqlens=cu,ssm_state_indices=slots,initial_state=actual_cache,use_qk_l2norm_in_kernel=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/sources/server_gdn_vacc_fast.py", line 306, in fused_recurrent_gated_delta_rule_fast
+    si = state_slot(n, 0)
+         ^^^^^^^^^^^^^^^^
+  File "/work/sources/server_gdn_vacc_fast.py", line 294, in state_slot
+    return ssi[n][t_off]
+           ~~~~~~^^^^^^^
+TypeError: 'int' object is not subscriptable

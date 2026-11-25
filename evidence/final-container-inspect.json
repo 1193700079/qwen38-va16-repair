@@ -1,0 +1,288 @@
+[
+    {
+        "Id": "c32392130e0bf7441da167d026c8c1d0e73cfcaa0f34580e3643a16148d1dc65",
+        "Created": "2026-11-25T06:19:24.197823071Z",
+        "Path": "/vacc/entrypoint.sh",
+        "Args": [
+            "vllm",
+            "serve",
+            "/models/Qwen3.8-27B",
+            "--served-model-name",
+            "qwen3.8-27b",
+            "--tensor-parallel-size",
+            "4",
+            "--max-model-len",
+            "4096",
+            "--enforce-eager",
+            "--no-disable-hybrid-kv-cache-manager",
+            "--generation-config",
+            "/work/generation",
+            "--middleware",
+            "concurrency_gate.SerialInferenceGate",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "18080"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 219043,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-25T06:27:20.984683654Z",
+            "FinishedAt": "2026-11-25T06:27:20.711836255Z"
+        },
+        "Image": "sha256:a1d8b0e5f6fc93978a85989fc433dc67ba838d64d9213e780ab6f05e60bf187b",
+        "ResolvConfPath": "/var/lib/docker/containers/c32392130e0bf7441da167d026c8c1d0e73cfcaa0f34580e3643a16148d1dc65/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/c32392130e0bf7441da167d026c8c1d0e73cfcaa0f34580e3643a16148d1dc65/hostname",
+        "HostsPath": "/var/lib/docker/containers/c32392130e0bf7441da167d026c8c1d0e73cfcaa0f34580e3643a16148d1dc65/hosts",
+        "LogPath": "/var/lib/docker/containers/c32392130e0bf7441da167d026c8c1d0e73cfcaa0f34580e3643a16148d1dc65/c32392130e0bf7441da167d026c8c1d0e73cfcaa0f34580e3643a16148d1dc65-json.log",
+        "Name": "/qwen38-va16-repaired",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "unconfined",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/dev:/dev",
+                "/home/test/models:/models:ro"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {
+                "18080/tcp": [
+                    {
+                        "HostIp": "127.0.0.1",
+                        "HostPort": "18080"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "unless-stopped",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": true,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "label=disable"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 34359738368,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": null,
+            "ReadonlyPaths": null
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/dev",
+                "Destination": "/dev",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/test/models",
+                "Destination": "/models",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "c32392130e0b",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "18080/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "VACC_VISIBLE_DEVICES=0,1,2,3",
+                "GDN_FORCE_VCCL=0",
+                "GDN_STREAM_SYNC=0",
+                "PATH=/vacc:/opt/venv/bin:/opt/venv/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "CC=/usr/bin/gcc-12",
+                "CXX=/usr/bin/g++-12",
+                "CCACHE_DIR=/root/.cache/ccache",
+                "CMAKE_CXX_COMPILER_LAUNCHER=ccache",
+                "VIRTUAL_ENV=/opt/venv",
+                "UV_PYTHON_INSTALL_DIR=/opt/uv/python",
+                "UV_HTTP_TIMEOUT=500",
+                "PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu",
+                "UV_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu",
+                "UV_INDEX_STRATEGY=unsafe-best-match",
+                "UV_LINK_MODE=copy",
+                "TARGETARCH=amd64",
+                "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4:/opt/venv/lib/libiomp5.so",
+                "TZ=Asia/Shanghai",
+                "VACC_LOG_LEVEL=critical,critical",
+                "VLLM_MLA_PERFORM_MATRIX_ABSORPTION=0",
+                "FNLOG_LEVEL=error",
+                "VACC_INSTALL_PATH=/opt/vacc",
+                "VACM_LOG_CFG=/opt/vacc",
+                "LD_LIBRARY_PATH=/opt/vacc/_vacc_libs:/usr/local/lib:/usr/lib"
+            ],
+            "Cmd": [
+                "vllm",
+                "serve",
+                "/models/Qwen3.8-27B",
+                "--served-model-name",
+                "qwen3.8-27b",
+                "--tensor-parallel-size",
+                "4",
+                "--max-model-len",
+                "4096",
+                "--enforce-eager",
+                "--no-disable-hybrid-kv-cache-manager",
+                "--generation-config",
+                "/work/generation",
+                "--middleware",
+                "concurrency_gate.SerialInferenceGate",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "18080"
+            ],
+            "Image": "qwen38-va16-repaired:20261125",
+            "Volumes": null,
+            "WorkingDir": "/test",
+            "Entrypoint": [
+                "/vacc/entrypoint.sh"
+            ],
+            "Labels": {
+                "ai.vllm.build.cpu-amxbf16": "false",
+                "ai.vllm.build.cpu-arm-bf16": "false",
+                "ai.vllm.build.cpu-avx2": "false",
+                "ai.vllm.build.cpu-avx512": "false",
+                "ai.vllm.build.cpu-avx512bf16": "false",
+                "ai.vllm.build.cpu-avx512vnni": "false",
+                "ai.vllm.build.cpu-disable-avx512": "false",
+                "ai.vllm.build.python-version": "3.12",
+                "ai.vllm.build.target-arch": "amd64",
+                "org.opencontainers.image.description": "vLLM inference engine for CPU platforms",
+                "org.opencontainers.image.source": "https://github.com/vllm-project/vllm",
+                "org.opencontainers.image.title": "vLLM CPU",
+                "org.opencontainers.image.vendor": "vLLM Project",
+                "org.opencontainers.image.version": "22.04"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "4278a4133bf4f8285ff78f3ef96fc077b2bf4a7ac35e45f2e2ce922bba1bef89",
+            "SandboxKey": "/var/run/docker/netns/4278a4133bf4",
+            "Ports": {
+                "18080/tcp": [
+                    {
+                        "HostIp": "127.0.0.1",
+                        "HostPort": "18080"
+                    }
+                ]
+            },
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "2534b5d6234562794f75901fcdfe1714d4bec6e1e15274068ae83b04378b0157",
+                    "EndpointID": "84ed91b692752c10b07a10cd504b00054df00778aabc8c17645829208d28ed38",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "MacAddress": "1a:3f:8c:84:9e:37",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:a1d8b0e5f6fc93978a85989fc433dc67ba838d64d9213e780ab6f05e60bf187b",
+            "size": 9119,
+            "platform": {
+                "architecture": "amd64",
+                "os": "linux"
+            }
+        }
+    }
+]

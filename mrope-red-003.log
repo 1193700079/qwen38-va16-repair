@@ -1,0 +1,38 @@
+[7]: Initializing VACM logger with config: /opt/vacc/vslog.cfg.
+INFO 11-25 03:47:28 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 11-25 03:47:28 [__init__.py:46] - vacc -> vllm_vacc:register
+INFO 11-25 03:47:28 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 11-25 03:47:28 [__init__.py:212] Platform plugin vacc is activated
+INFO 11-25 03:47:36 [importing.py:44] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 11-25 03:47:36 [importing.py:68] Triton not installed or not compatible; certain GPU-related functions will not be available.
+/opt/venv/lib/python3.12/site-packages/vllm/entrypoints/openai/chat_completion/protocol.py:346: SyntaxWarning: invalid escape sequence '\e'
+  "(e.g. 'abcdabcdabcd...' or '\emoji \emoji \emoji ...'). This feature "
+/opt/venv/lib/python3.12/site-packages/vllm/entrypoints/openai/completion/protocol.py:176: SyntaxWarning: invalid escape sequence '\e'
+  "(e.g. 'abcdabcdabcd...' or '\emoji \emoji \emoji ...'). This feature "
+WARNING 11-25 03:47:39 [interface.py:226] Failed to import from vllm._C: ImportError('/opt/venv/lib/python3.12/site-packages/vllm/_C.abi3.so: undefined symbol: _ZN3c1013MessageLogger6streamB5cxx11Ev')
+[2026-11-25 03:47:40] WARNING platform.py:126: Pin memory is not supported on VACC.
+Accessing `__path__` from `.models.qwen2_vl.image_processing_qwen2_vl`. Returning `__path__` instead. Behavior may be different and this alias will be removed in future versions.
+Accessing `Qwen2VLFastImageProcessorKwargs` from `.models.qwen2_vl.image_processing_qwen2_vl`. Returning `Qwen2VLFastImageProcessorKwargs` instead. Behavior may be different and this alias will be removed in future versions.
+Accessing `__path__` from `.models.qwen2_vl.image_processing_qwen2_vl`. Returning `__path__` instead. Behavior may be different and this alias will be removed in future versions.
+Accessing `Qwen2VLImageProcessorKwargs` from `.models.qwen2_vl.image_processing_qwen2_vl`. Returning `Qwen2VLImageProcessorKwargs` instead. Behavior may be different and this alias will be removed in future versions.
+`Qwen2VLImageProcessorFast` is deprecated. The `Fast` suffix for image processors has been removed; use `Qwen2VLImageProcessor` instead.
+INFO 11-25 03:47:41 [scheduler.py:231] Chunked prefill is enabled with max_num_batched_tokens=2048.
+INFO 11-25 03:47:41 [vllm.py:747] Asynchronous scheduling is enabled.
+WARNING 11-25 03:47:41 [vllm.py:792] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+[2026-11-25 03:47:41] WARNING platform.py:96: WARNING gpu_memory_utilization is not supported on VACC
+Traceback (most recent call last):
+  File "/work/test_mrope_dispatch.py", line 37, in <module>
+    with torch.inference_mode():got_q,got_k=r(pos.to('vacc'),q.to('vacc'),k.to('vacc'))
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/vllm/model_executor/custom_op.py", line 129, in forward
+    return self._forward_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1962, in __getattr__
+    raise AttributeError(
+AttributeError: 'MRotaryEmbedding' object has no attribute '_forward_method'. Did you mean: '_forward_pre_hooks'?

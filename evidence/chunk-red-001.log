@@ -1,0 +1,8 @@
+[7]: Initializing VACM logger with config: /opt/vacc/vslog.cfg.
+Traceback (most recent call last):
+  File "/work/test_chunk_hardware.py", line 35, in <module>
+    check('captured-layer0',*[c[k] for k in ['q','k','v','g','beta','initial_state']])
+  File "/work/test_chunk_hardware.py", line 29, in check
+    assert s.dtype==torch.float32, f'final state dtype contract: {s.dtype}'
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: final state dtype contract: torch.bfloat16

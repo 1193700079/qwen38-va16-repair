@@ -1,0 +1,5 @@
+[7]: Initializing VACM logger with config: /opt/vacc/vslog.cfg.
+PASS captured-layer0 seconds 0.47304426692426205 output_max_error 0.0061731753330986905 state_max_error 0.007601589538438702
+PASS alternating-weak-decay seconds 0.1049972539767623 output_max_error 0.0002536146916063131 state_max_error 0.001261677080434509
+PASS strong-decay seconds 0.1039472920820117 output_max_error 0.0002276718539036826 state_max_error 0.0004981811661972646
+PASS multi-chunk seconds 0.1450673690997064 output_max_error 0.0010883818478385487 state_max_error 0.002342970759437707

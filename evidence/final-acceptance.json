@@ -1,0 +1,47 @@
+[
+  {
+    "name": "default_greedy",
+    "passed": true,
+    "status": 200,
+    "elapsed_s": 9.49539365596138,
+    "text": "2",
+    "usage": {
+      "prompt_tokens": 22,
+      "total_tokens": 24,
+      "completion_tokens": 2,
+      "prompt_tokens_details": null
+    }
+  },
+  {
+    "name": "queued_request_0",
+    "passed": true,
+    "status": 200,
+    "elapsed_s": 13.101801411947235,
+    "text": "12",
+    "usage": {
+      "prompt_tokens": 22,
+      "total_tokens": 25,
+      "completion_tokens": 3,
+      "prompt_tokens_details": null
+    }
+  },
+  {
+    "name": "queued_request_1",
+    "passed": true,
+    "status": 200,
+    "elapsed_s": 26.208465209929273,
+    "text": "81",
+    "usage": {
+      "prompt_tokens": 22,
+      "total_tokens": 25,
+      "completion_tokens": 3,
+      "prompt_tokens_details": null
+    }
+  },
+  {
+    "name": "unsupported_sampling_guard",
+    "passed": true,
+    "status": 400,
+    "elapsed_s": 0.0019408580847084522
+  }
+]

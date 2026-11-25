@@ -1,0 +1,32 @@
+{
+  "baseline_image": "qwen38_gdnfast:latest",
+  "baseline_image_id": "sha256:a1fc47c3bb81da03817f467d2b9a4f379379583d5600d1e160d3c07b64000009",
+  "files": {
+    "chunk_compat.py": "6e1566d7043e96af9386d05b683b5ef33c6771bb348810aca6ddafdb84474421",
+    "recurrent_compat.py": "eea2f55ef5dd49cd8da644efa65841be41e6106ffca4d57949160a91a64d7bf8",
+    "mrope_compat.py": "84141ddeabb1cc3eab666902e0fcb592c4fcca9b1210921eeda5cfb8709c6c74",
+    "attention_compat.py": "1573174b180e8dca99829a0f9244fae58b4bffd9ebc84942772c7fa403015754",
+    "sampler_compat.py": "0fb04c72572f1923a47cd72d0e29cc22ffec9b27bf712e04f914110bcc6a56f0",
+    "fix_cpu_mask.py": "974c3d5fbb1f4cfb3fde4c5b6b0ca5569d599f943ac167d257e02464e55e91aa",
+    "fix_mrope.py": "1728e28b5d69309ecba61e08024861e343658089345b6ce12a913f46c563320c",
+    "fix_recurrent.py": "4708205522fc67fe311776c02ff3cc65666b18082c0fb88a2eec03f7115f55ed",
+    "fix_chunk_attention.py": "10ec80accfdb0673947a445f434547766e7eea6ced4eff8dcf18d06dfb80d729",
+    "fix_sampler.py": "4be34a81685d5a11f735b4a1d625e444c28e513f3486370e918397bff7479189",
+    "concurrency_gate.py": "16c3ab36eb12c996291da0589bc58c899db256c55d262e3a423dfbb603ba2a0f",
+    "generation_config.json": "4fe719842490e6121e7851632f0efa6fabf3f55a4a54052ab9fff45fc70ba68f",
+    "start_qwen38.sh": "fd4669677ef6ca98747f34ab8d0c5f486dbe947d02f0c8cb0b1f72894dca15e3",
+    "sources/server_gdn_vacc_fast.py": "614318c182267adb521e6b3829c35a6b99ca2aa636198cd1e1e06e431309a45d",
+    "Dockerfile": "dfe6a2e90deece668063bbccb06c6b52875261db54b8993c46790fb0e738a1ea"
+  },
+  "repaired_image": "qwen38-va16-repaired:20261125",
+  "repaired_image_id": "sha256:a1d8b0e5f6fc93978a85989fc433dc67ba838d64d9213e780ab6f05e60bf187b",
+  "status": "verified text/greedy compatibility deployment; restart, sequential requests and 1203-token recall passed; not full-feature certification",
+  "context_limit": 4096,
+  "not_supported": [
+    "stochastic sampling",
+    "multimodal input",
+    "speculative decode",
+    "mixed prefill/decode execution",
+    "structured/tool-constrained decoding"
+  ]
+}

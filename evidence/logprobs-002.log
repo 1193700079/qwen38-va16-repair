@@ -1,0 +1,8 @@
+[7]: Initializing VACM logger with config: /opt/vacc/vslog.cfg.
+INFO 11-25 05:57:11 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 11-25 05:57:11 [__init__.py:46] - vacc -> vllm_vacc:register
+INFO 11-25 05:57:11 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 11-25 05:57:11 [__init__.py:212] Platform plugin vacc is activated
+INFO 11-25 05:57:18 [importing.py:44] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 11-25 05:57:18 [importing.py:68] Triton not installed or not compatible; certain GPU-related functions will not be available.
+PASS LOGPROBS int32 token IDs and full vocabulary
