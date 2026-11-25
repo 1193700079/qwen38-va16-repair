@@ -1,12 +1,17 @@
-"""Serialize verified text/greedy requests through their full streaming lifetime.
-Return explicit 400 for unverified paths rather than silently mis-computing.
+"""Validation + bounded-concurrency gate for the verified text paths.
+Greedy and CPU random sampling are verified; batched decode is handled by the
+compat kernels. Return explicit 400 for still-unverified paths (tools/structured/
+multimodal) rather than silently mis-computing. Set GDN_MAX_CONCURRENCY=1 to
+force serial execution.
 """
 import asyncio
 import json
+import os
 
 def validate_body(body):
-    if body.get('temperature',0) not in (None,0,0.0):
-        return 'This compatibility build currently validates temperature=0 only.'
+    t=body.get('temperature',0)
+    if t is not None and (not isinstance(t,(int,float)) or t<0):
+        return 'temperature must be a non-negative number.'
     if body.get('n',1)!=1 or body.get('best_of',1)!=1:
         return 'Only one completion per request is verified.'
     if body.get('tools') or body.get('response_format') or body.get('structured_outputs'):
@@ -22,7 +27,7 @@ class SerialInferenceGate:
     other_inference={'/v1/responses','/v1/messages','/inference/v1/generate','/invocations'}
     def __init__(self,app):
         self.app=app
-        self.lock=asyncio.Lock()
+        self.lock=asyncio.Semaphore(max(1,int(os.environ.get('GDN_MAX_CONCURRENCY','2'))))
     async def __call__(self,scope,receive,send):
         if scope.get('type')!='http' or scope.get('method')!='POST':
             return await self.app(scope,receive,send)

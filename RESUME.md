@@ -2,11 +2,12 @@
 
 ## 当前结果
 - 原版 Qwen/Qwen3.8-27B BF16 在 10.1.2.136 VA16 上真实多 token 生成通过，未换权重。
-- 活跃容器 `qwen38-va16-repaired`，镜像 `qwen38-va16-repaired:20261125`。
-- 镜像 ID `sha256:a1d8b0e5f6fc93978a85989fc433dc67ba838d64d9213e780ab6f05e60bf187b`。
-- 本机只监听服务器 127.0.0.1:18080，TP4 用逻辑 die 0–3（非4张物理卡）。context cap 4096，restart unless-stopped。
+- 活跃容器 `qwen38-va16-repaired`，镜像 `qwen38-va16-repaired:20261125-r2`。
+- 镜像 ID `sha256:66af7d8f6389d2b62ad8f3b86f2683e3d8e1c1ca28cf808749465f27684166aa`。
+- 本机只监听服务器 127.0.0.1:18080，TP4 用逻辑 die 0–3（非4张物理卡）。context cap **8192**，`GDN_MAX_CONCURRENCY=2`，restart unless-stopped。
 - 已验证：18 shard SHA-256、34 CPU tests、多个硬件 RED/GREEN tests、水管题12/5、加法Python代码、全新请求12、1203-token跨页召回4729、并发到达排队的12/81、真正重启后81。
-- 性能慢，約0.4–0.5tok/s；不要拿独立算子时间代替模型吞吐。图像/随机采样/speculation/混合并发未验收且API拒绝部分路径。
+- **r2 增量已验证**：随机采样 seed=42 两次同文（CPU multinomial）；并发2交错 12*5=60 / 9*9=81（混合 prefill+decode 批）；5493-token 长文召回 4729（8192 上下文）；r2 重启后 greedy=2 / random same / 60,81 复验通过。证据 evidence/acceptance-r2.json、evidence/restart-verify-r2.json。
+- 性能仍约 0.42 tok/s（decode 逐算子 launch ~0.9ms，无融合 GDN decode kernel/无 graph/无 torch.compile；prefill 已向量化）。>8192 触发厂商 block_table.py:67 ZeroDivisionError（BLOCK_GROUP_SIZE 默认8192）。多模态：模型 supports_multimodal=True + 厂商 ViT 融合算子在，但未端到端验证，API 仍拒绝图像。
 
 ## 必须纠正的历史结论
 - 旧报告/全局记忆里“Python层无法修复”“TP4通信/缓存写死锁”均已被实际回归反证，不能据此停止或换模型。

@@ -7,9 +7,9 @@ import torch
 def _host(t):
     return t.detach().cpu().tolist() if isinstance(t,torch.Tensor) else list(t)
 
+QCH=128  # query chunk to bound FP32 score memory for prefill/mixed batches
+
 def forward_decode_compat(self,layer,query,key,value,kv_cache,md,output=None):
-    if md.num_prefill_tokens:
-        raise NotImplementedError('Mixed prefill/decode must be validated before use')
     if self.alibi_slopes is not None or self.sliding_window is not None:
         raise NotImplementedError('Only unwindowed decoder attention verified')
     from vllm_vacc.vllm.attention.ops.vacc_paged_attn import VaccPagedAttention
@@ -23,21 +23,29 @@ def forward_decode_compat(self,layer,query,key,value,kv_cache,md,output=None):
     tables=_host(raw)
     lengths=_host(md.seq_lens_tensor)
     starts=_host(md.query_start_loc)
+    hm=torch.arange(self.num_heads,device=q.device)//self.num_queries_per_kv
     outs=[]
     for i,row in enumerate(tables):
         n=int(lengths[i]); nb=math.ceil(n/blocksize)
         if nb>len(row):raise ValueError('Insufficient physical blocks')
-        # Host indices avoid scalar D2H transfers and preserve exact block order.
-        ks=torch.cat([kc[int(j)] for j in row[:nb]],dim=0)[:n]
-        vs=torch.cat([vc[int(j)] for j in row[:nb]],dim=0)[:n]
-        qi=q[starts[i]:starts[i+1]]
-        if qi.shape[0]!=1:raise NotImplementedError('No speculative multi-token decode')
-        hm=torch.arange(self.num_heads,device=q.device)//self.num_queries_per_kv
-        kg=ks[:,hm].float().transpose(0,1)
+        # Single gather of the physical pages preserves exact block order.
+        idx=torch.tensor(row[:nb],device=q.device,dtype=torch.long)
+        ks=kc.index_select(0,idx).reshape(-1,self.num_kv_heads,self.head_size)[:n]
+        vs=vc.index_select(0,idx).reshape(-1,self.num_kv_heads,self.head_size)[:n]
+        kg=ks[:,hm].float().transpose(0,1)   # [heads, n, head]
         vg=vs[:,hm].float().transpose(0,1)
-        scores=torch.bmm(qi.float().transpose(0,1),kg.transpose(-1,-2))*self.scale
-        attn=torch.bmm(scores.softmax(-1),vg).transpose(0,1).to(q.dtype)
-        outs.append(attn)
+        q0=starts[i]; q1=starts[i+1]; qlen=q1-q0
+        base=n-qlen  # first query token's absolute position
+        for c0 in range(0,qlen,QCH):
+            c1=min(qlen,c0+QCH)
+            qi=q[q0+c0:q0+c1].float().transpose(0,1)  # [heads, chunk, head]
+            scores=torch.bmm(qi,kg.transpose(-1,-2))*self.scale  # [heads,chunk,n]
+            pos=base+torch.arange(c0,c1,device=q.device)
+            keypos=torch.arange(n,device=q.device)
+            causal=keypos[None,:]<=pos[:,None]  # [chunk,n]
+            scores=scores.masked_fill(~causal[None,:,:],float('-inf'))
+            attn=torch.bmm(scores.softmax(-1),vg).transpose(0,1).to(q.dtype)
+            outs.append(attn)
     return torch.cat(outs,dim=0).reshape(-1,self.num_heads*self.head_size)
 
 def install():
