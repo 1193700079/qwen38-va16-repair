@@ -69,7 +69,11 @@ def _normalize_slots(ssi, n):
 
 
 def _recurrence(S, qe_t, ke_t, vf_t, gf_t, bf_t):
-    """One gated-delta-rule step. S [HV,V,K]; *_t [HV,*]. Returns updated S, o [HV,V]."""
+    """One gated-delta-rule step. S [HV,V,K]; *_t [HV,*]. Returns updated S, o [HV,V].
+
+    einsum maps to a faster VACC kernel than explicit bmm with N=1 (measured:
+    bmm variant 0.257 tok/s vs einsum 0.419 tok/s), so keep einsum here.
+    """
     S = S * gf_t.exp()[..., None, None]
     kv = torch.einsum('hvk,hk->hv', S, ke_t)
     delta = (vf_t - kv) * bf_t[..., None]

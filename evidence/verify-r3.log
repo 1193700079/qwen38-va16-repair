@@ -1,0 +1,10 @@
+== mm_red:
+红色
+== mm_blue:
+蓝色
+== greedy:
+12
+== long20k:
+4729
+usage {'prompt_tokens': 12036, 'total_tokens': 12041, 'completion_tokens': 5, 'prompt_tokens_details': None}
+== done:

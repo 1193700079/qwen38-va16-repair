@@ -18,8 +18,8 @@ def validate_body(body):
         return 'Structured/tool-constrained generation is not verified in this build.'
     for m in body.get('messages',[]):
         c=m.get('content')
-        if isinstance(c,list) and any(x.get('type')!='text' for x in c if isinstance(x,dict)):
-            return 'Only text input is verified; image/audio/video input is unavailable.'
+        if isinstance(c,list) and any(x.get('type') not in ('text','image_url') for x in c if isinstance(x,dict)):
+            return 'Only text and image input are verified; audio/video input is unavailable.'
     return None
 
 class SerialInferenceGate:

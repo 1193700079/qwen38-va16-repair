@@ -1,22 +1,23 @@
 # Qwen3.8-27B / 瀚博 VA16 修复验收报告
 
-更新：2026-11-25。**本报告替代此前“TP4 死锁无法在 Python 层修复”的结论。**
+更新：2026-11-26（r3）。**本报告替代此前“TP4 死锁无法在 Python 层修复”的结论。**
 
 ## 验收结论
 
-原版 Qwen/Qwen3.8-27B 已在 10.1.2.136 上完成真实文本生成，并以独立镜像部署。未更换基座、未量化、未修改模型权重。
+原版 Qwen/Qwen3.8-27B 已在 10.1.2.136 上完成真实文本生成**与图像多模态理解**，并以独立镜像部署。未更换基座、未量化、未修改模型权重。
 
-已验证范围：BF16 原版权重、TP4（4 个计算 die，即 1 张 VA16）、文本输入、temperature=0 贪心 **与 temperature>0 随机采样（seed 可复现）**、**并发 2（含 prefill+decode 混合批）**、串行/排队请求。不是全功能或高吞吐生产认证。
+已验证范围：BF16 原版权重、TP4（4 个计算 die，即 1 张 VA16）、文本输入、**图像输入（多模态）**、temperature=0 贪心 **与 temperature>0 随机采样（seed 可复现）**、**并发 2（含 prefill+decode 混合批）**、**32768 上下文（12036-token 长文召回正确）**、串行/排队请求。不是全功能或高吞吐生产认证。
 
 ## 已部署服务
 
 - 容器：`qwen38-va16-repaired`
-- 镜像：`qwen38-va16-repaired:20261125-r2`
-- 镜像 ID：`sha256:66af7d8f6389d2b62ad8f3b86f2683e3d8e1c1ca28cf808749465f27684166aa`
+- 镜像：`qwen38-va16-repaired:20261125-r3`
+- 镜像 ID：`sha256:2714fc6c715c4c468e9586297344f00754c18b65d71170fdcfa492a1f55b02e7`
 - 服务端地址：`http://127.0.0.1:18080/v1`
 - 模型 ID：`qwen3.8-27b`
-- 上下文上限：**8192**（r2 实测 5493-token 长文召回正确；16384 触发厂商 block_table 除零，见限制）
+- 上下文上限：**32768**（r3 实测 12036-token 长文召回正确；厂商 block_table 除零已修，见修复）
 - 并发：`GDN_MAX_CONCURRENCY=2`（asyncio 信号量；混合批 attention 已兼容）
+- 多模态：**图像输入已启用并验证**（纯红/纯蓝 PNG 均正确识别）；音频/视频仍拒绝
 - 计算设备：`VACC_VISIBLE_DEVICES=0,1,2,3`
 - 重启策略：`unless-stopped`；已执行真实容器重启并重新生成正确答案。
 - 权重路径：`/home/test/models/Qwen3.8-27B`，容器内只读挂载。
@@ -72,6 +73,9 @@ initial_state[~has_initial_state, ...] = 0
 - logprobs：修复厂商 int32 token ID 与上游 int64 契约冲突，输出概率和排名通过回归。
 - 请求层（r1）：完整流式响应期间串行化；不支持的模式在进入引擎前返回明确 400。
 - **r2 增量**：随机采样（CPU multinomial，temperature/top_k/top_p，seed 可复现，设备回归 PASS）；并发上限 2（asyncio 信号量）；attention 兼容统一 causal 分块（QCH=128）覆盖 prefill+decode 混合批；上下文 4096→8192（5493-token 长文召回正确）。r2 验收与重启复验全部通过（见 evidence/acceptance-r2.json、restart-verify-r2.json）。
+- **r3 增量（上下文 + 多模态）**：
+  - **上下文 8192→32768**：厂商 `BLOCK_GROUP_SIZE`(默认8192) 除以各 KV 组 block_size 得组因子；mamba/state 组 block_size=max_model_len，>8192 时组因子=0 触发 `ZeroDivisionError`（block_table.py:67、single_type_kv_cache_manager.py:46、kv_cache_utils.py:278/315、vacc_model_runner.py:243）。修复为对组因子统一 `max(1, env//block_size)`（state 组每请求一个 state 块，组因子=1 语义正确；attention 组不变；不改 env 以免破坏 vendor prefill 分组）。12036-token 长文召回正确。
+  - **多模态图像启用**：厂商 ViT 路径在 VACC 上多处 segfault/契约错误，逐层替换为纯 torch 兼容实现——① `MMEncoderAttention` 的 torch-SDPA fallback segfault → 显式 bmm 全注意力（含 varlen/GQA）；② `patch_merger_vision` 融合算子 segfault（faulthandler 定位 custom_ops.py:3238）→ 纯 torch norm+fc1+act+fc2；③ `fuse_mlp_vision` 同样 segfault → 纯 torch；④ 视觉 linear 为 plain nn.Linear 返回 Tensor 而非 2-tuple → `_lin` 兼容。请求守卫放开 image_url（仍拒 audio/video）。纯红/纯蓝 PNG 端到端识别正确（证明真实视觉而非记忆）。
 
 此前模型注册、tuple 权重加载及 hybrid-cache 等兼容补丁保留在基线镜像中。
 
@@ -99,19 +103,23 @@ initial_state[~has_initial_state, ...] = 0
 | 并发 2（12*5 与 9*9 交错到达） | `60` / `81` | **混合 prefill+decode 批正确**（r2） |
 | 5493-token 长文找校验码 | `4729` | **8192 上下文正确**（r2） |
 | r2 容器重启后 greedy/随机/并发 | `2` / same=true / `60`,`81` | 重启后全部复验通过 |
+| 纯红 64×64 PNG 问颜色 | `红色` | **图像多模态正确**（r3） |
+| 纯蓝 64×64 PNG 问颜色 | `蓝色` | **真实视觉而非记忆**（r3） |
+| 12036-token 长文找校验码 | `4729` | **32768 上下文正确**（r3） |
+| r3  clean 重启后 mm/贪心/长文 | 红色/蓝色/`12`/`4729` | 重启后复验通过（evidence/final2.log、verify-r3.log） |
 
 增量解码与 fresh prefill 对照：测试中 top token 一致；`1+1` 首 token logprob 一致，第二个结束 token logprob 约 -3.10e-6 / -3.34e-6。仅为所测样例的数值一致性证据，不代表完整 benchmark。
 
 ## 性能与限制（重要）
 
-- 当前是兼容实现，仍慢：短题 3–5 个生成 token 约 10–18 秒；48-token 回答约 114 秒；约 **0.42 token/s** 的长回答解码速度（r2 实测）。
+- 当前是兼容实现，仍慢：短题 3–5 个生成 token 约 10–18 秒。**解码速度随上下文上限变化（权衡）**：r2@8192 约 **0.42 token/s**（48 token/114.5s，evidence/acceptance-r2.json）；r3@32768 约 **0.25 token/s**（48 token/189.4s，evidence/r4-restart-perf.log）。增大 max-model-len 会放大混合缓存/调度开销，decode 变慢；如需更快解码可回退 `--max-model-len 8192`。
 - **解码慢的根因（probe_perf_surface.py 实测）**：VACC 单算子 launch 开销约 0.9 ms（64 次 tiny einsum=0.056 s），批量化同操作仅 0.0038 s；decode 每 token 逐层逐算子发射，无融合 GDN decode kernel、无 graph capture（`has_graph=[]`）、PrivateUse1 后端无 torch.compile。device 端全词表 argmax 0.054 s/call 反而比 logits d2h(0.00065 s)+CPU argmax 慢，故采样保留 CPU。**prefill 已向量化分块**（5493-token 长文可行）；decode 吞吐受厂商运行时逐算子开销限制，属厂商侧优化空间。
 - 5493-token 长输入找数字约 119 秒（8192 上下文）。不能把独立小算子的 0.05 秒当作模型端到端速度。
-- **随机采样已支持**（temperature/top_k/top_p，CPU multinomial，seed 可复现）；**并发 2 已支持**（含 prefill+decode 混合批）。图片/视频/音频输入、结构化工具约束输出仍被拒绝。
-- **多模态可行性（评估，未启用）**：模型类 `supports_multimodal=True`；厂商提供 ViT 融合算子（`fuse_atten_vit`/`fuse_mlp_vision`/`patch_merger_vision`/`qwen2vl_img_preprocess`/`rot_pos_emb_qwenvl`），视觉路径具备硬件基础；但端到端视觉编码+嵌入合并未经 RED/GREEN 验证，当前请求守卫拒绝多模态以保护已验证文本路径。启用需独立一轮验证。
-- **上下文 >8192 的厂商缺陷**：`--max-model-len 16384` 触发 `vllm_vacc/vllm/v1/worker/block_table.py:67` `ZeroDivisionError`（`env_blk_grp_size//block_size`；`BLOCK_GROUP_SIZE` 默认 8192，见 `models/vars.py:58`）。该常量同时被 vendor prefill reshape 使用，擅自调大有破坏 prefill 风险，故保守取 8192。
+- **随机采样已支持**（temperature/top_k/top_p，CPU multinomial，seed 可复现）；**并发 2 已支持**（含 prefill+decode 混合批）；**图像多模态已支持并验证**（r3）。音频/视频输入、结构化工具约束输出仍被拒绝。
+- **上下文上限 32768（r3）**：厂商 block_table 组因子除零已修（`max(1, env//block_size)`）。**1M 上下文不可行**：模型原生 rope 上限 `max_position_embeddings=262144`（config.json），远超即超出模型训练位置编码范围；且 KV/state 显存随长度线性增长，单 die 31.36GB 无法容纳 1M token 的混合缓存。32768 为当前显存/稳定性权衡下的验证上限，可再向上试探但非 1M。
+- **解码提速尝试与结论（r3）**：einsum 递推基线 r2@8192≈0.42、r3@32768≈0.25 token/s。尝试将 GDN decode 递推的 einsum 改为显式 3D bmm 以减少 kernel 数，实测**更慢**（48 token/186.7s=0.257 token/s），已回退 einsum。**graph capture 确证不可用**：`torch.vacc`/`torch_vacc.vacc` 无任何 graph/capture/replay API（probe_graph.py：`vacc_graph_attrs=[]`），`torch.CUDAGraph` 仅 CUDA 后端；厂商亦无融合 GDN decode kernel（custom_qwen3_ops 仅 MoE）。故 decode 吞吐受厂商运行时逐算子 launch 开销（约0.9ms/op）限制，纯 Python 层微优化无法突破，属厂商侧优化空间。**>0.42 token/s 的目标在本厂商运行时上未达成**（且 32768 上下文进一步降速）。
 - 不支持 speculative decode；没有启用不明后端的 torch.compile。
-- 未验证原生超长上下文（>8192）、多机并行或完整多模态能力。
+- 未验证多机并行、音频/视频多模态、>32768 上下文与 1M 上下文（不可行，见上）。
 - 构建依赖服务器已保留的 `qwen38_gdnfast:latest` 基线镜像，基线 ID 与补丁源哈希均记录；不是无依赖通用安装包。
 
 ## 交付文件
@@ -121,4 +129,4 @@ initial_state[~has_initial_state, ...] = 0
 - [运行脚本](<repair-20261125/start_qwen38.sh>)
 - [测试与运行证据目录](<repair-20261125/evidence/>)
 
-最终 service health 和 `/v1/models` 均为 HTTP 200；当前 `max_model_len=8192`、`GDN_MAX_CONCURRENCY=2`，只监听 127.0.0.1:18080。
+最终 service health 和 `/v1/models` 均为 HTTP 200；当前 `max_model_len=32768`、`GDN_MAX_CONCURRENCY=2`、图像多模态已启用，只监听 127.0.0.1:18080。
